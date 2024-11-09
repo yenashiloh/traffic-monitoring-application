@@ -1,7 +1,6 @@
 <?php
-session_start(); // Start the session at the beginning
+session_start(); 
 
-// Connect to the database
 $servername = "localhost";
 $username = 'root';
 $password = '';
@@ -9,12 +8,10 @@ $dbname = "vehicle_coding_detector";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Check connection
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Handle form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $vehicle_type = $_POST["vehicle_type"];
     $plate_number = $_POST["plate_number"];
@@ -22,16 +19,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $time = $_POST["time"];
     $city = $_POST["city"];
 
-    // Define coding hours
     $start_coding_time = "10:01";
     $end_coding_time = "16:59";
     $coding_days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
-    $exempted_vehicle_types = ["Motorcycle", "Emergency Vehicle"]; // Add other exempted vehicle types as needed
+    $exempted_vehicle_types = ["Motorcycle", "Emergency Vehicle"]; 
 
-    // Convert time to 24-hour format
     $formatted_time = date("H:i", strtotime($time));
 
-    // Check if the vehicle is exempted
     $is_exempted = false;
     foreach ($exempted_vehicle_types as $exempted_type) {
         if (stripos($vehicle_type, $exempted_type) !== false) {
@@ -40,7 +34,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
-    // Determine coding status
     if ($is_exempted) {
         $coding_status = "EXEMPTED";
     } elseif (in_array($day, $coding_days) && $formatted_time >= $start_coding_time && $formatted_time <= $end_coding_time) {
@@ -49,7 +42,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $coding_status = "NOT CODING";
     }
 
-    // Insert the new record into the database
     $stmt = $conn->prepare("INSERT INTO vehicle_coding (vehicle_type, plate_number, day, time, city, coding_status)
                              VALUES (?, ?, ?, ?, ?, ?)");
     $stmt->bind_param("ssssss", $vehicle_type, $plate_number, $day, $formatted_time, $city, $coding_status);
@@ -61,7 +53,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $_SESSION['coding_status'] = $coding_status;
         $_SESSION['city'] = $city;
 
-        // Redirect to the output page
         header("Location: output.php");
         exit();
     } else {

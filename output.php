@@ -1,18 +1,18 @@
 <?php
 session_start(); 
 
-if (isset($_SESSION['vehicle_type']) && isset($_SESSION['plate_number']) && isset($_SESSION['coding_status']) && isset($_SESSION['city'])) {
-    $vehicle_type = $_SESSION['vehicle_type'];
-    $plate_number = $_SESSION['plate_number'];
-    $coding_status = $_SESSION['coding_status'];
-    $city = $_SESSION['city'];
+    if (isset($_SESSION['vehicle_type']) && isset($_SESSION['plate_number']) && isset($_SESSION['coding_status']) && isset($_SESSION['city'])) {
+        $vehicle_type = $_SESSION['vehicle_type'];
+        $plate_number = $_SESSION['plate_number'];
+        $coding_status = $_SESSION['coding_status'];
+        $city = $_SESSION['city'];
 
-    session_unset();
-} else {
-    header("Location: index.php"); 
-    exit();
-}
-?>
+        session_unset();
+    } else {
+        header("Location: index.php"); 
+        exit();
+    }
+    ?>
 
 <!DOCTYPE html>
 <html>
