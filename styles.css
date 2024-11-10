@@ -1,0 +1,590 @@
+/* Reset styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    background: linear-gradient(to bottom right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0)), url('images/bg2.jpg');
+    background-size: cover;
+    background-blend-mode: overlay;
+    color: #f4f4f4;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    min-height: 100vh;
+    width: 100vw;
+}
+
+/* Card Container */
+.card {
+    display: flex;
+    width: 100%;
+    max-width: 800px;
+    background-color: rgba(255, 255, 255, 0.75);
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.65);
+    overflow: hidden;
+    transition: transform 0.3s ease-in-out;
+    margin-left: 5%;
+}
+
+.card:hover {
+    transform: scale(1.02);
+}
+
+/* Title Section */
+.card-title {
+    width: 45%;
+    background-color: rgba(0, 56, 169, 0.75);
+    color: #fefefe;
+    padding: 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: left;
+    border-top-left-radius: 20px;
+    border-bottom-left-radius: 20px;
+}
+
+.card-title h1 {
+    font-size: 3.9rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: #fefefe;
+}
+
+.card-title p {
+    font-size: 1.2rem;
+    color: #d1d1d1;
+}
+
+/* Form Section */
+form {
+    width: 55%;
+    padding: 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* Form Inputs and Labels */
+label {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #020003;
+    margin-bottom: 8px;
+    letter-spacing: 0.5px;
+}
+
+input,
+select,
+textarea,
+button {
+    width: 100%;
+    padding: 14px;
+    margin-bottom: 20px;
+    font-size: 1rem;
+    border-radius: 10px;
+    border: 1px solid #f1f1f1;
+    background-color: #fefefe;
+    color: #020003;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    outline: none;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: #0535a8;
+    box-shadow: 0 0 8px rgba(5, 53, 168, 0.3);
+    background-color: rgba(255, 255, 255, 1);
+}
+
+input:hover,
+select:hover,
+textarea:hover {
+    background-color: rgba(255, 255, 255, 0.95);
+}
+
+input[type="text"] {
+    text-transform: uppercase;
+}
+
+/* Modern Time Picker */
+input[type="time"] {
+    font-size: 1rem;
+    padding: 14px;
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.85);
+    border-radius: 10px;
+    border: 1px solid #f1f1f1;
+    color: #020003;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+}
+
+input[type="time"]:focus {
+    border-color: #0535a8;
+    box-shadow: 0 0 8px rgba(5, 53, 168, 0.3);
+    background-color: #fff;
+}
+
+/* Button Styles */
+button {
+    background-color: #0535a8;
+    color: white;
+    border: none;
+    padding: 14px 0;
+    font-size: 1.2rem;
+    cursor: pointer;
+    border-radius: 10px;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #031c56;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .card {
+        flex-direction: column;
+        /* Stack the card content vertically */
+        width: 100%;
+        /* Ensure the card takes full width */
+        margin: 30px;
+        /* Remove any margin */
+    }
+
+    .card-title {
+        width: 100%;
+        padding: 20px;
+        /* Reduced padding for smaller screens */
+        text-align: center;
+        border-top-left-radius: 20px;
+        border-bottom-left-radius: 0;
+    }
+
+    form {
+        width: 100%;
+        /* Ensure the form takes full width */
+        padding: 20px;
+        /* Adjust form padding */
+    }
+
+    h1 {
+        font-size: 2rem;
+        /* Reduced font size for header */
+    }
+
+    p {
+        font-size: 1rem;
+        /* Adjust paragraph font size */
+    }
+
+    label {
+        font-size: 0.9rem;
+        /* Smaller label font size for better readability */
+    }
+
+    input,
+    select,
+    textarea,
+    button {
+        font-size: 1rem;
+        /* Ensure input fields and buttons are well-sized */
+        padding: 12px;
+        /* Slightly reduced padding for inputs */
+    }
+
+    button {
+        font-size: 1.1rem;
+        /* Slightly larger button font for easier interaction */
+    }
+
+    /* Adjust modal content for mobile screens */
+    .modal-content {
+        width: 90%;
+        /* Ensure modal takes 90% of the screen */
+        padding: 30px;
+        /* Adjust padding for mobile */
+        max-width: 500px;
+        /* Limit the maximum width of the modal */
+    }
+
+    /* Adjust close button size for mobile */
+    .close {
+        font-size: 1.5rem;
+        /* Smaller close button for mobile */
+    }
+}
+
+
+/* Modal Background Overlay */
+.modal {
+    display: none;
+    /* Hidden by default */
+    position: fixed;
+    /* Stay in place */
+    z-index: 1;
+    /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%;
+    /* Full width */
+    height: 100%;
+    /* Full height */
+    background-color: rgba(0, 0, 0, 0.5);
+    /* Black with opacity */
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Modal Content */
+.modal-content {
+    background-color: #fff;
+    margin: 10% auto;
+    /* Adjusted to center the modal */
+    padding: 40px 50px;
+    border-radius: 12px;
+    /* Softer rounded corners */
+    width: 80%;
+    height: 400px;
+    /* Increased width to make the modal bigger */
+    max-width: 700px;
+    /* Max width for larger size */
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    position: relative;
+    /* Make sure close button is positioned relative to this */
+    animation: slideIn 0.4s ease-in-out;
+    overflow-y: auto;
+    /* Allows scrolling if content exceeds modal size */
+    text-align: center;
+}
+
+/* Close Button (Inside Modal Content) */
+.close {
+    color: #999;
+    font-size: 2rem;
+    font-weight: bold;
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+    color: #333;
+    text-decoration: none;
+}
+
+/* Modal Message */
+#modalMessage {
+    font-size: 1.4rem;
+    /* Slightly larger font size */
+    color: #333;
+    margin-top: 20px;
+}
+
+/* Modal Animation Effects */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-50%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Smooth transition effects for modal */
+.modal-content {
+    transition: all 0.3s ease-in-out;
+}
+
+/* Button Styles */
+button {
+    background-color: #0535a8;
+    /* Primary color */
+    color: white;
+    border: none;
+    padding: 14px 0;
+    font-size: 1.2rem;
+    cursor: pointer;
+    border-radius: 10px;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #031c56;
+}
+
+/* Responsive Modal for smaller screens */
+@media (max-width: 600px) {
+    .modal-content {
+        padding: 30px;
+        width: 90%;
+        max-width: 500px;
+        /* Adjust width on small screens */
+    }
+}
+
+.road{
+    margin-top: 60px;
+    position: relative;
+    width: auto;
+    height: 150px;
+    background: #333;
+    border-radius: 75px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.road::before{
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg,#fff,#fff 50%,
+    transparent 50% ,transparent 100%);
+    background-size: 50px;
+    animation: animate_road 0.125s linear infinite;
+}
+
+@keyframes animate_road{
+    0%{
+        background-position: 50px 0;
+    }
+    100%{
+        background-position: 0 0;
+    }
+}
+
+.taxi{
+    position: absolute;
+    width: 200px;
+    height: 80px;
+    background: #f4b603;
+    border-radius: 10px;
+    box-shadow: -10px 10px rgba(0,0,0,0.25);
+    transform-style: preserve-3d;
+    perspective: 800px;
+    animation: animate_taxi 2s linear infinite;
+    z-index: 10;
+}
+
+@keyframes animate_taxi{
+    0%{
+        transform: translateX(-20px) translateY(0px);
+    }
+    5%{
+        transform: translateX(-10px) translateY(0px);
+    }
+    50%{
+        transform: translateX(20px) translateY(0px);
+    }
+    75%{
+        transform: translateX(-10px) translateY(0px);
+    }
+    100%{
+        transform: translateX(20px) translateY(0px);
+    }
+}
+
+
+.taxi::before{
+    content: '';
+    position: absolute;
+    top: 12px;
+    left: 2px;
+    border-radius: 2px;
+    width: 5px;
+    height: 15px;
+    background: #fc3c25;
+    box-shadow: 0 42px #fc3c25;
+
+}
+
+.taxi::after{
+    content: '';
+    position: absolute;
+    top: 10px;
+    right: 2px;
+    background: #fff;
+    box-shadow: 0 44px #fff;
+    width: 6px;
+    height: 16px;
+}
+.taxi span{
+    position: absolute;
+    inset: 5px 10px;
+    background: #fdd206;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.taxi span::before{
+    content: 'taxi';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    color: #111;
+    transform: translate(-50%,-50%) rotate(90deg);
+    background: #fff;
+    padding: 2px;
+    font-size: 0.75em;
+    font-weight: 1000;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    border-radius: 2px;
+    box-shadow: 0 0 0 1px #0005;
+    z-index: 10;
+}
+
+u::before {
+    content: '\f05e'; /* Unicode for the "ban" icon (No Allowed) */
+    font-family: 'Font Awesome 5 Free'; /* Font Awesome's font family */
+    font-weight: 900; /* Font Awesome requires bold weight for some icons */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Center the icon */
+    font-size: 15em; /* Adjust size as needed */
+    color: red; /* Color of the icon */
+    z-index: 11; /* Ensure the 'No Allowed' icon is on top */
+}
+
+
+.taxi span b{
+    position: absolute;
+    inset: 0 30px;
+    background: #111;
+    border-radius: 10px;
+}
+
+.taxi span b::before{
+    content: '';
+    position: absolute;
+    inset: 6px 25px;
+    background: #fdd206;
+    border-radius: 5px;
+}
+
+.taxi span b::after{
+    content: '';
+    position: absolute;
+    inset: 0px 58px;
+    background: #fdd206;
+}
+
+.taxi span i{
+    position: absolute;
+    inset: 0;
+}
+
+.taxi span i::before{
+    content: '';
+    position: absolute;
+    top: 7px;
+    left: 20px;
+    width: 40px;
+    height:5px;
+    background: #fdd206;
+    transform: rotate(15deg);
+    transform-origin: right;
+    box-shadow: 100px 34px #fdd206;
+
+}
+
+.taxi span i::after{
+    content: '';
+    position: absolute;
+    bottom: 7px ;
+    left: 20px;
+    width: 40px;
+    height: 5px;
+    background: #fdd206;
+    transform-origin: right;
+    transform: rotate(-15deg);
+    box-shadow: 100px -34px #fdd206;
+}
+.light_beam{
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    height: 70px;
+    background: #0002;
+    border-radius: 15px;
+    transform-style: preserve-3d;
+}
+
+.light_beam::before{
+    content: '';
+    position: absolute;
+    top: 5px;
+    left: 0;
+    width: 150px;
+    height: 16px;
+    background: linear-gradient(90deg,#fff,transparent);
+    transform-origin: left;
+    transform: rotateY(-50deg) perspective(500px);
+
+}
+
+.light_beam::after{
+    content: '';
+    position: absolute;
+    bottom: 5px;
+    left: 0;
+    width: 150px;
+    height: 16px;
+    background: linear-gradient(90deg,#fff,transparent);
+    transform-origin: left;
+    transform: rotateY(-50deg) perspective(500px);
+}
+
+/* Tooltip container */
+.tooltip {
+    position: relative;
+    display: inline-block;
+}
+
+/* Tooltip text */
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 220px;
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    border-radius: 5px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 31%; /* Position above the input field */
+    left: -35%;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+/* Show tooltip text on hover */
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+}

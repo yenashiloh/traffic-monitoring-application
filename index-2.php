@@ -1,131 +1,104 @@
-<?php
-session_start(); 
-
-$servername = "localhost";
-$username = 'root';
-$password = '';
-$dbname = "vehicle_coding_detector";
-
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
-
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $vehicle_type = $_POST["vehicle_type"];
-    $plate_number = $_POST["plate_number"];
-    $day = $_POST["day"];
-    $time = $_POST["time"];
-
-    $start_coding_time = "10:01";
-    $end_coding_time = "16:59";
-    $coding_days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
-    $exempted_vehicle_types = ["Motorcycle", "Emergency Vehicle"];
-
-    $formatted_time = date("H:i", strtotime($time));
-
-    $is_exempted = false;
-    foreach ($exempted_vehicle_types as $exempted_type) {
-        if (stripos($vehicle_type, $exempted_type) !== false) {
-            $is_exempted = true;
-            break;
-        }
-    }
-
-    if ($is_exempted) {
-        $coding_status = "EXEMPTED";
-    } elseif (in_array($day, $coding_days) && $formatted_time >= $start_coding_time && $formatted_time <= $end_coding_time) {
-        $coding_status = "CODING";
-    } else {
-        $coding_status = "NOT CODING";
-    }
-
-    $stmt = $conn->prepare("INSERT INTO vehicle_coding (vehicle_type, plate_number, day, time, coding_status)
-                             VALUES (?, ?, ?, ?, ?)");
-    $stmt->bind_param("sssss", $vehicle_type, $plate_number, $day, $formatted_time, $coding_status);
-
-    if ($stmt->execute() === TRUE) {
-        $_SESSION['vehicle_type'] = $vehicle_type;
-        $_SESSION['plate_number'] = $plate_number;
-        $_SESSION['coding_status'] = $coding_status;
-
-        header("Location: output-2.php");
-        exit();
-    } else {
-        echo "Error: " . $stmt->error;
-    }
-    $stmt->close();
-}
-
-$conn->close();
-?>
-
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-    <meta charset="utf-8">
-    <title>Traffic Monitoring Application</title>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="fonts/material-design-iconic-font/css/material-design-iconic-font.min.css">
-    <link rel="stylesheet" href="css/style.css">
-    <style>
-        .form-wrapper {
-            width: 100%;
-        }
-        .time-form-warapper {
-            display: flex;
-            align-items: center;
-            width: 100%;
-        }
-        .time-wrapper {
-            display: flex;
-            align-items: center;
-            width: 100%;
-        }
-        .time-wrapper .form-control {
-            width: 100%;
-        }
-        .time-wrapper label {
-            margin-right: 5px;
-        }
-    </style>
+    <title>Vehicle Registration</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="js/validation.js" defer></script>
 </head>
+
 <body>
-    <div class="wrapper" style="background-image: url('images/bg-motor.jpg');">
-        <div class="inner">
-            <div class="image-holder">
-                <img src="images/motor.png" alt="">
+    <div class="card">
+        <!-- Title Section -->
+        <div class="card-title">
+            <h1>Check Vehicle UVVRP Coding</h1>
+            <p>Enter the vehicle plate number to determine if it is subject to the UVVRP coding scheme on a specific day based on the last digit of the plate number.</p>
+        </div>
+
+        <!-- Form Section -->
+        <form action="submit.php" method="POST">
+            <!-- Vehicle Type Dropdown -->
+            <label for="vehicleType">Vehicle Type:</label>
+            <select id="vehicleType" name="vehicleType" required>
+                <option value="">Select Vehicle Type</option>
+                <option value="private">Private Vehicle</option>
+                <option value="motorcycle">Motorcycle Vehicle</option>
+                <option value="government">Government Vehicle</option>
+                <option value="puv">Public Utility Vehicle (PUV)</option>
+                <option value="commercial">Commercial Vehicle</option>
+                <option value="hire">Motor Vehicles for Hire (e.g., Transport Network Services)</option>
+                <option value="diplomatic">Diplomatic Vehicle</option>
+                <option value="electric">Electric Vehicle</option>
+                <option value="hybrid">Hybrid Vehicle</option>
+                <option value="special">Special Vehicles (e.g., Emergency Vehicles, Fire Trucks)</option>
+            </select>
+
+            <!-- Plate Number -->
+            <label for="plateNumber">Plate Number:</label>
+            <div class="tooltip">
+                <input type="text" id="plateNumber" name="plateNumber" placeholder="ABC 1234" maxlength="7" required>
+                <span class="tooltiptext">Note: Plate number must be entered in capital letters.</span>
             </div>
-            <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
-                <h3>Traffic Monitoring Application</h3>
-                <div class="form-wrapper">
-                    <input type="text" placeholder="Enter Vehicle Type" class="form-control" id="vehicle_type" name="vehicle_type" required>
+
+            <!-- Date -->
+            <label for="date">Date:</label>
+            <input type="date" id="date" name="date" required onchange="setDay()">
+
+            <!-- Day (Disabled) -->
+            <label for="day">Day:</label>
+            <input type="text" id="day" name="day" disabled>
+
+            <label for="time">Time:</label>
+            <input type="time" id="time" name="time" required>
+
+            <!-- City Dropdown -->
+            <label for="city">City:</label>
+            <select id="city" name="city" required>
+                <option value="">Select City</option>
+                <option value="Caloocan">Caloocan</option>
+                <option value="Las Piñas">Las Piñas</option>
+                <option value="Malabon">Malabon</option>
+                <option value="Manila">Manila</option>
+                <option value="Marikina">Marikina</option>
+                <option value="Mandaluyong">Mandaluyong</option>
+                <option value="Makati">Makati</option>
+                <option value="Muntinlupa">Muntinlupa</option>
+                <option value="Navotas">Navotas</option>
+                <option value="Pasay">Pasay</option>
+                <option value="Paranaque">Paranaque</option>
+                <option value="Pasig">Pasig</option>
+                <option value="Pateros">Pateros</option>
+                <option value="Quezon City">Quezon City</option>
+                <option value="San Juan">San Juan</option>
+                <option value="Taguig">Taguig</option>
+                <option value="Valenzuela">Valenzuela</option>
+            </select>
+
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+
+    <div id="resultModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="modalMessage"></div>
+
+            <div class="road">
+                <u id="codingDayIndicator"></u>
+                <div class="taxi">
+                    <div class="light_beam"></div>
+                    <span>
+                        <b></b>
+                        <i></i>
+                    </span>
                 </div>
-                <div class="form-wrapper">
-                    <input type="text" placeholder="Enter Plate Number" class="form-control" id="plate_number" name="plate_number" required>
-                </div>
-                <div class="form-wrapper">
-                    <select class="form-control" id="day" name="day" required>
-                        <option value="" disabled selected>Select a day</option>
-                        <option value="Sunday">Sunday</option>
-                        <option value="Monday">Monday</option>
-                        <option value="Tuesday">Tuesday</option>
-                        <option value="Wednesday">Wednesday</option>
-                        <option value="Thursday">Thursday</option>
-                        <option value="Friday">Friday</option>
-                        <option value="Saturday">Saturday</option>
-                    </select>
-                </div>
-                <div class="form-wrapper time-form-warapper">
-                    <div class="time-wrapper">
-                        <label for="time">Time</label>
-                        <input type="time" class="form-control" id="time" name="time" required>
-                    </div>
-                </div>
-                <button type="submit">Submit <i class="zmdi zmdi-arrow-right"></i></button>
-            </form>
+            </div>
         </div>
     </div>
+
 </body>
+
 </html>
