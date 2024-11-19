@@ -39,7 +39,7 @@
             <!-- Plate Number -->
             <label for="plateNumber">Plate Number:</label>
             <div class="tooltip">
-                <input type="text" id="plateNumber" name="plateNumber" placeholder="ABC 1234" maxlength="7" required>
+                <input type="text" id="plateNumber" name="plateNumber" required>
                 <span class="tooltiptext">Note: Plate number must be entered in capital letters.</span>
             </div>
 

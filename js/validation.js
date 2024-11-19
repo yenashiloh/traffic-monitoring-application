@@ -1,40 +1,248 @@
+// Main event listener for vehicle type changes
 document.getElementById("vehicleType").addEventListener("change", function () {
     const vehicleType = this.value;
     const plateInput = document.getElementById("plateNumber");
 
     // Clear the plate number field whenever vehicle type changes
-    plateInput.value = ""; // Clear the input field
+    plateInput.value = "";
 
-    // Adjust pattern, range, and placeholder based on vehicle type
+    // Configure validation rules based on vehicle type
     if (vehicleType === "private" || vehicleType === "commercial" || vehicleType === "hire" || vehicleType === "government") {
-        plateInput.setAttribute("pattern", "[A-Z]{3}[0-9]{4}|[0-9]{4}[A-Z]{3}");
-        plateInput.setAttribute("minlength", "7"); // e.g., PBC1234 or 1234PBC
-        plateInput.setAttribute("maxlength", "7");
-        plateInput.placeholder = "PBC1234 / 1234PBC";
+        plateInput.placeholder = "LLL-DDDD";  // L for letters, D for digits
+        setupPrivateVehicleValidation(plateInput);
     } else if (vehicleType === "motorcycle") {
-        // Updated pattern for motorcycles
-        plateInput.setAttribute("pattern", "[A-Z]{2}[0-9]{5}");
-        plateInput.setAttribute("minlength", "7"); // e.g., AB12345
-        plateInput.setAttribute("maxlength", "7");
-        plateInput.placeholder = "AB12345";
+        plateInput.placeholder = "DDD-LLL or L-DDD-LL";
+        setupMotorcycleValidation(plateInput);
     } else if (vehicleType === "puv") {
-        // Updated PUV plate format
-        plateInput.setAttribute("pattern", "[0-9]{3}[A-Z]{3}|[A-Z]{1}[0-9]{3}[A-Z]{2}");
-        plateInput.setAttribute("minlength", "6"); // e.g., 123PBC or P123BC
-        plateInput.setAttribute("maxlength", "6");
-        plateInput.placeholder = "123PBC / P123BC";
+        plateInput.placeholder = "LLL-DDD or LLL-DDDD";
+        setupPUVsValidation(plateInput);
     } else if (vehicleType === "diplomatic" || vehicleType === "electric" || vehicleType === "hybrid" || vehicleType === "special") {
-        plateInput.setAttribute("pattern", "[A-Z]{2}[0-9]{4}");
-        plateInput.setAttribute("minlength", "6"); // e.g., AB1234
-        plateInput.setAttribute("maxlength", "6");
-        plateInput.placeholder = "AB1234";
+        plateInput.placeholder = "LL-DDDD";
+        setupSpecialVehicleValidation(plateInput);
     } else {
-        plateInput.setAttribute("pattern", "");
-        plateInput.setAttribute("minlength", "");
-        plateInput.setAttribute("maxlength", "");
         plateInput.placeholder = "Enter Plate Number";
+        plateInput.removeEventListener("input", validatePlateNumber);
     }
 });
+
+function setupPrivateVehicleValidation(input) {
+    input.addEventListener("input", function (e) {
+        let value = e.target.value.toUpperCase();
+        
+        // Prevent typing numbers before letters
+        if (/^\d/.test(value)) {
+            input.value = value.replace(/^\d+/, ''); // Remove leading numbers
+            return;
+        }
+
+        value = value.replace(/[^A-Z0-9-]/g, ''); // Remove invalid characters
+
+        let letters = '';
+        let numbers = '';
+
+        if (value.includes('-')) {
+            [letters, numbers] = value.split('-');
+            letters = letters.replace(/[^A-Z]/g, '');
+            numbers = numbers.replace(/[^0-9]/g, '');
+        } else {
+            letters = value.match(/^[A-Z]+/) ? value.match(/^[A-Z]+/)[0] : '';
+            numbers = value.replace(/[A-Z]/g, '').replace(/[^0-9]/g, '');
+        }
+
+        // Format the value
+        if (letters && numbers) {
+            input.value = letters + '-' + numbers;
+        } else {
+            input.value = letters + numbers;
+        }
+
+        // Strict validation
+        if (input.value.length > 0) {
+            if (letters.length !== 3) {
+                input.setCustomValidity("Plate number must have exactly 3 letters (e.g., LLL-DDDD)");
+            } else if (numbers.length !== 4) {
+                input.setCustomValidity("Plate number must have exactly 4 numbers (e.g., LLL-DDDD)");
+            } else {
+                input.setCustomValidity("");
+            }
+        } else {
+            input.setCustomValidity("");
+        }
+    });
+
+    // Form submit validation
+    input.form.addEventListener("submit", function (event) {
+        const value = input.value;
+        const pattern = /^[A-Z]{3}-\d{4}$/;
+
+        if (!pattern.test(value)) {
+            event.preventDefault();
+            input.setCustomValidity("Please enter a valid plate number in the format LLL-DDDD");
+            input.reportValidity();
+        }
+    });
+}
+
+function setupMotorcycleValidation(input) {
+    input.addEventListener("input", function (e) {
+        let value = e.target.value.toUpperCase();
+        value = value.replace(/[^A-Z0-9]/g, ''); // Remove invalid characters
+
+        let formattedValue = '';
+
+        if (/^[A-Z]/.test(value)) {
+            // Format as 1 letter - 3 digits - 2 letters (A-123-BC)
+            let letters1 = value.slice(0, 1);
+            let numbers = value.slice(1).replace(/[^0-9]/g, '').slice(0, 3);
+            let letters2 = value.slice(1 + numbers.length).replace(/[^A-Z]/g, '').slice(0, 2);
+
+            formattedValue = `${letters1}-${numbers}${letters2 ? '-' + letters2 : ''}`;
+        } else if (/^\d/.test(value)) {
+            // Format as 3 digits - 3 letters (123-ABC)
+            let numbers = value.slice(0, 3);
+            let letters = value.slice(3).replace(/[^A-Z]/g, '').slice(0, 3);
+
+            formattedValue = `${numbers}-${letters}`;
+        }
+
+        // Update the input value
+        input.value = formattedValue;
+
+        // Strict validation
+        const validLetterFirst = /^[A-Z]-\d{1,3}-[A-Z]{1,2}$/;
+        const validNumberFirst = /^\d{3}-[A-Z]{3}$/;
+
+        if (input.value.length > 0) {
+            if (!validLetterFirst.test(input.value) && !validNumberFirst.test(input.value)) {
+                input.setCustomValidity("Plate number must follow the format L-DDD-LL or DDD-LLL.");
+            } else {
+                input.setCustomValidity("");
+            }
+        } else {
+            input.setCustomValidity("");
+        }
+    });
+
+    // Form submit validation
+    input.form.addEventListener("submit", function (event) {
+        const value = input.value;
+        const validPattern = /^[A-Z]-\d{3}-[A-Z]{2}$|^\d{3}-[A-Z]{3}$/;
+
+        if (!validPattern.test(value)) {
+            event.preventDefault();
+            input.setCustomValidity("Please enter a valid plate number in the format L-DDD-LL or DDD-LLL.");
+            input.reportValidity();
+        }
+    });
+}
+
+function setupPUVsValidation(input) {
+    input.addEventListener("input", function (e) {
+        let value = e.target.value.toUpperCase();
+
+        // Prevent typing numbers before letters
+        if (/^\d/.test(value)) {
+            input.value = value.replace(/^\d+/, ''); // Remove leading numbers
+            return;
+        }
+
+        value = value.replace(/[^A-Z0-9-]/g, ''); // Remove invalid characters
+
+        let letters = '';
+        let numbers = '';
+
+        if (value.includes('-')) {
+            [letters, numbers] = value.split('-');
+            letters = letters.replace(/[^A-Z]/g, '');
+            numbers = numbers.replace(/[^0-9]/g, '');
+        } else {
+            letters = value.match(/^[A-Z]+/) ? value.match(/^[A-Z]+/)[0] : '';
+            numbers = value.replace(/[A-Z]/g, '').replace(/[^0-9]/g, '');
+        }
+
+        // Format the value
+        if (letters && numbers) {
+            input.value = letters + '-' + numbers;
+        } else {
+            input.value = letters + numbers;
+        }
+
+        // Strict validation
+        if (input.value.length > 0) {
+            if (letters.length !== 3) {
+                input.setCustomValidity("Plate number must have exactly 3 letters (e.g., LLL-DDD or LLL-DDDD)");
+            } else if (numbers.length < 3 || numbers.length > 4) {
+                input.setCustomValidity("Plate number must have 3 or 4 numbers (e.g., LLL-DDD or LLL-DDDD)");
+            } else {
+                input.setCustomValidity("");
+            }
+        } else {
+            input.setCustomValidity("");
+        }
+    });
+
+    // Form submit validation
+    input.form.addEventListener("submit", function (event) {
+        const value = input.value;
+        const pattern = /^[A-Z]{3}-\d{3,4}$/; // Match LLL-DDD or LLL-DDDD
+
+        if (!pattern.test(value)) {
+            event.preventDefault();
+            input.setCustomValidity("Please enter a valid plate number in the format LLL-DDD or LLL-DDDD");
+            input.reportValidity();
+        }
+    });
+}
+
+function setupSpecialVehicleValidation(input) {
+    input.addEventListener("input", function(e) {
+        let value = e.target.value.toUpperCase();
+        value = value.replace(/[^A-Z0-9-]/g, '');
+        
+        let letters = '';
+        let numbers = '';
+        
+        if (value.includes('-')) {
+            [letters, numbers] = value.split('-');
+            letters = letters.replace(/[^A-Z]/g, '');
+            numbers = numbers.replace(/[^0-9]/g, '');
+        } else {
+            letters = value.match(/[A-Z]+/g) ? value.match(/[A-Z]+/g)[0] : '';
+            numbers = value.replace(/[A-Z]/g, '').replace(/[^0-9]/g, '');
+        }
+        
+        if (letters && numbers) {
+            input.value = letters + '-' + numbers;
+        } else {
+            input.value = letters + numbers;
+        }
+        
+        // Strict validation
+        if (input.value.length > 0) {
+            if (letters.length !== 2) {
+                input.setCustomValidity("First part must have exactly 2 letters (e.g., AB-1234)");
+            } else if (numbers.length !== 4) {
+                input.setCustomValidity("Second part must have exactly 4 numbers (e.g., AB-1234)");
+            } else {
+                input.setCustomValidity("");
+            }
+        } else {
+            input.setCustomValidity("");
+        }
+    });
+
+    // Form submit validation
+    input.form.addEventListener("submit", function(event) {
+        const value = input.value;
+        const pattern = /^[A-Z]{2}-\d{4}$/;
+        
+        if (!pattern.test(value)) {
+            event.preventDefault();
+            input.setCustomValidity("Please enter a valid plate number in the format AB-1234");
+            input.reportValidity();
+        }
+    });
+}
 
 function setDay() {
     const date = document.getElementById("date").value;
@@ -96,8 +304,8 @@ document.querySelector("form").addEventListener("submit", function (event) {
 
     // Check if selected date is holiday
     const isHoliday = holidays.some(holiday => holiday.toDateString() === date.toDateString());
-    if (isHoliday){
-        codingDay = 'NOT CODING';
+    if (isHoliday) {
+        codingDay = 'EXEMPTED';
     }
 
     const codingCities = {
@@ -195,7 +403,7 @@ document.querySelector("form").addEventListener("submit", function (event) {
         };
 
         if (city === 'Makati') {
-            codingDay = timeCheck(cityInfo.codingHours[0], cityInfo.codingHours[1]) ? 'CODING' : 'NOT CODING';
+            codingDay = timeCheck(cityInfo.codingHours[0], cityInfo.codingHours[1]) ? 'CODING' : 'CODING';
         } else {
             const firstWindowCheck = timeCheck(cityInfo.windowHours[0], cityInfo.windowHours[1]);
             const secondWindowCheck = timeCheck(cityInfo.windowHours[2], cityInfo.windowHours[3]);
@@ -217,7 +425,7 @@ document.querySelector("form").addEventListener("submit", function (event) {
     // Check if codingDay is "CODING" and show or hide the <u> element accordingly
     if (codingDay === "CODING") {
         uElement.style.display = "block"; // Show the <u> element
-    } else if (codingDay === "NOT CODING") {
+    } else if (codingDay === "NOT CODING" || codingDay === "EXEMPTED") {
         uElement.style.display = "none"; // Hide the <u> element
     } else {
         Element.style.display = "block";
@@ -245,7 +453,6 @@ document.querySelector("form").addEventListener("submit", function (event) {
     });
 });
 
-// Close the modal when the user clicks on <span> (x)
 document.querySelector(".close").addEventListener("click", function () {
     document.getElementById("resultModal").style.display = "none";
 });
